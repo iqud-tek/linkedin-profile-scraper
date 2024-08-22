@@ -49,7 +49,6 @@ function injectCopyButtons() {
             const button = createCopyButton(profileContainer, profileLink.href);
             const imageWrapper = profileContainer.querySelector('.ivm-image-view-model');
             if (imageWrapper) {
-                imageWrapper.style.display = 'flex';
                 imageWrapper.style.display = 'flex';  // Ensure flex layout for positioning
                 imageWrapper.prepend(button);
             }
@@ -91,9 +90,9 @@ function createCopyButton(profileContainer, profileUrl) {
 
 // Function to extract individual profile information
 function extractProfileInfo(profileElement, profileId, profileUrl) {
-    const rawName = profileElement.querySelector('.update-components-actor__name, .artdeco-entity-lockup__title, .text-view-model')?.innerText.trim();
+    const rawName = profileElement.querySelector('.update-components-actor__name, .artdeco-entity-lockup__title, .text-view-model')?.textContent.trim();
     const cleanName = cleanProfileName(rawName);
-    const title = profileElement.querySelector('.update-components-actor__description, .artdeco-entity-lockup__caption, .t12.t-black--light.t-normal')?.innerText.trim() || '--';
+    const title = profileElement.querySelector('.update-components-actor__description, .artdeco-entity-lockup__caption, .t12.t-black--light.t-normal')?.textContent.trim() || '--';
 
     const profileData = {
         profileId,
@@ -105,18 +104,24 @@ function extractProfileInfo(profileElement, profileId, profileUrl) {
     saveProfileToLocalStorage(profileData);
 }
 
-// Function to clean the profile name by removing text after "View"
 function cleanProfileName(rawName) {
-    // Split by "View" and take the first part before it
+    // Remove any text after "View"
     if (rawName && rawName.includes('View')) {
-        return rawName.split('View')[0].trim();
+        rawName = rawName.split('View')[0];
     }
-    return rawName;
+console.log('rawName ',rawName);
+    // Split the name into parts and keep only the first two (e.g., first name and last name)
+    const nameParts = rawName.split(' '); // Split by whitespace
+// console.log('nameParts ',nameParts);
+    let cleanedName = nameParts[0];
+    if(nameParts[1]){
+        cleanedName =cleanedName.concat(' ',nameParts[1]);
+    }
+    return cleanedName;
 }
 
 // Function to save profile to local storage
 function saveProfileToLocalStorage(profileData) {
-    // Check if the profile is already stored to avoid duplicates
     chrome.storage.local.get({ profiles: [] }, function (result) {
         const profiles = result.profiles || [];
         const isProfileExists = profiles.some(profile => profile.profileId === profileData.profileId);
@@ -141,7 +146,6 @@ function copyAllProfilesInVotesModal() {
         const profileUrl = profileLink.href;
         const profileId = extractProfileId(profileUrl);
 
-        // Extract profile information and save it to local storage
         extractProfileInfo(profileContainer, profileId, profileUrl);
     });
 
@@ -150,24 +154,20 @@ function copyAllProfilesInVotesModal() {
 
 // Updated function to extract the profile ID from LinkedIn URL with improved rules
 function extractProfileId(url) {
-    // Remove query parameters
     const cleanUrl = url.split('?')[0];
     const urlParts = cleanUrl.split('/');
 
-    // Check if the URL is a company profile
     if (url.includes('/company/')) {
         const companyIdIndex = urlParts.indexOf('company') + 1;
-        return urlParts[companyIdIndex];  // Return the company ID
+        return urlParts[companyIdIndex];
     }
 
-    // Check if the URL is an individual profile (in/username)
     if (url.includes('/in/')) {
         const profileIdIndex = urlParts.indexOf('in') + 1;
-        return urlParts[profileIdIndex];  // Return the profile ID
+        return urlParts[profileIdIndex];
     }
 
-    // Default case: return the last segment
-    return urlParts[urlParts.length - 1];  // Return the profile ID (last part of URL)
+    return urlParts[urlParts.length - 1];
 }
 
 // Observe for changes in the feed, reactions modal, and votes modal (infinite scroll or new profiles loaded)

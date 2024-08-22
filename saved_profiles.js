@@ -48,30 +48,29 @@ document.getElementById('clear-data-btn').addEventListener('click', function() {
 
 // Event listener for the download CSV button
 document.getElementById('download-csv-btn').addEventListener('click', function() {
+    console.log('download-csv-btn')
     chrome.storage.local.get({ profiles: [] }, function(result) {
+        console.log('Inside button click of download-csv-btn');
         const profiles = result.profiles || [];
-        if (profiles.length === 0) {
-            alert('No profiles to download.');
-            return;
-        }
-
-        // Prepare CSV data
-        let csvContent = 'data:text/csv;charset=utf-8,#,Name,Profile URL,Title\n';
+        console.log('profiles ',profiles);
+        const csvRows = [
+            ['#', 'Name', 'Profile URL', 'Title']
+        ];
 
         profiles.forEach((profile, index) => {
-            const cleanUrl = profile.profileUrl.split('?')[0]; // Remove URL parameters
-            const csvRow = `${index + 1},"${profile.name}","${cleanUrl}","${profile.title}"\n`;
-            csvContent += csvRow;
+            const row = [index + 1, profile.name, profile.profileUrl, profile.title];
+            csvRows.push(row);
         });
 
-        // Encode CSV content and create download link
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement('a');
-        link.setAttribute('href', encodedUri);
-        link.setAttribute('download', 'saved_profiles.csv');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const csvContent = csvRows.map(e => e.join(",")).join("\n");
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'linkedin_profiles.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     });
 });
 
