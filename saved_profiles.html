@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved LinkedIn Profiles</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .profile-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .btn-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .btn-refresh {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Saved LinkedIn Profiles</h1>
+
+    <!-- Button to clear data with confirmation -->
+    <button id="clear-data-btn" class="btn btn-danger">Clear Data</button>
+
+    <!-- Table to display saved profiles -->
+    <table class="table table-striped profile-table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Profile URL</th>
+                <th scope="col">Title</th>
+            </tr>
+        </thead>
+        <tbody id="profiles-body">
+            <!-- Profile rows will be inserted here -->
+        </tbody>
+    </table>
+
+    <!-- Button container for refresh and CSV download -->
+    <div class="btn-container">
+        <button id="refresh-btn" class="btn btn-primary">Refresh Profiles</button>
+        <button id="download-csv-btn" class="btn btn-success">Download as CSV</button>
+    </div>
+
+    <script src="saved_profiles.js"></script>
+</body>
+</html>
